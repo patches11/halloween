@@ -5,9 +5,7 @@ import RPi.GPIO as GPIO
 import Adafruit_WS2801
 import Adafruit_GPIO.SPI as SPI
  
-import SimpleHTTPServer
-import SocketServer
-
+from http.server import SimpleHTTPRequestHandler, HTTPServer
 import threading
 import sys
 import random
@@ -77,7 +75,7 @@ class Lightning:
 global state
 state = 0
 
-class ServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
+class ServerHandler(SimpleHTTPRequestHandler):
 
     def goHome(self):
         self.send_response(302)
@@ -99,7 +97,7 @@ class ServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             state = 999
             self.goHome()
         else:
-            SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
+            super().do_GET()
 
 def flow(i):
     return ((i * 2 + int(time.time() * 20)) % 200) + 56
@@ -109,8 +107,8 @@ if __name__ == "__main__":
 
     lightning = Lightning()
 
-    httpd = SocketServer.TCPServer(("", PORT), Handler)
-    thread = threading.Thread(target = httpd.serve_forever)
+    httpd = HTTPServer(("", PORT), Handler)
+    thread = threading.Thread(target=httpd.serve_forever)
     thread.daemon = True
     try:
         thread.start()
@@ -137,4 +135,3 @@ if __name__ == "__main__":
         httpd.shutdown()
         sys.exit(0)
 
-    
