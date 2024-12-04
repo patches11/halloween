@@ -1,0 +1,2 @@
+RPi.GPIO==0.7.1
+Adafruit-WS2801==1.0.1
